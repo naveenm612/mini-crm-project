@@ -1,8 +1,10 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { Box, Toolbar } from '@mui/material';
+import ProtectedRoute from '../components/ProtectedRoute';
 import Sidebar from '../components/Sidebar';
 import Topbar from '../components/Topbar';
-
+import Login from '../pages/Login';
+import Register from '../pages/Register';
 import Dashboard from '../pages/Dashboard';
 import LeadsList from '../pages/Leads/LeadsList';
 import LeadForm from '../pages/Leads/LeadForm';
@@ -14,39 +16,48 @@ import TaskForm from '../pages/Tasks/TaskForm';
 
 const AppRoutes = () => {
   return (
-    <Box sx={{ display: 'flex' }}>
-      <Sidebar />
+    <Routes>
+      {/* Public routes */}
+      <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
 
-      <Box component="main" sx={{ flexGrow: 1 }}>
-        <Topbar />
-        <Toolbar />
-
-        <Routes>
-          {/* Default */}
-          <Route path="/" element={<Navigate to="/dashboard" replace />} />
-
-          {/* Dashboard */}
-          <Route path="/dashboard" element={<Dashboard />} />
-
-          {/* Leads */}
-          <Route path="/leads" element={<LeadsList />} />
-          <Route path="/leads/new" element={<LeadForm />} />
-          <Route path="/leads/edit/:id" element={<LeadForm />} />
-
-          {/* Companies */}
-          <Route path="/companies" element={<CompaniesList />} />
-          <Route path="/companies/new" element={<CompanyForm />} />
-          <Route path="/companies/:id" element={<CompanyDetail />} />
-
-          {/* Tasks */}
-          <Route path="/tasks" element={<TasksList />} />
-          <Route path="/tasks/new" element={<TaskForm />} />
-
-          {/* Fallback */}
-          <Route path="*" element={<Navigate to="/dashboard" replace />} />
-        </Routes>
-      </Box>
-    </Box>
+      {/* Protected routes with layout */}
+      <Route
+        path="/*"
+        element={
+          <ProtectedRoute>
+            <Box sx={{ display: 'flex' }}>
+              <Sidebar />
+              <Box component="main" sx={{ flexGrow: 1 }}>
+                <Topbar />
+                <Toolbar />
+                <Routes>
+                  <Route path="/dashboard" element={<Dashboard />} />
+                  
+                  {/* Leads routes */}
+                  <Route path="/leads" element={<LeadsList />} />
+                  <Route path="/leads/new" element={<LeadForm />} />
+                  <Route path="/leads/edit/:id" element={<LeadForm />} />
+                  
+                  {/* Companies routes */}
+                  <Route path="/companies" element={<CompaniesList />} />
+                  <Route path="/companies/new" element={<CompanyForm />} />
+                  <Route path="/companies/:id" element={<CompanyDetail />} />
+                  
+                  {/* Tasks routes */}
+                  <Route path="/tasks" element={<TasksList />} />
+                  <Route path="/tasks/new" element={<TaskForm />} />
+                  
+                  {/* Default redirect */}
+                  <Route path="/" element={<Navigate to="/dashboard" replace />} />
+                  <Route path="*" element={<Navigate to="/dashboard" replace />} />
+                </Routes>
+              </Box>
+            </Box>
+          </ProtectedRoute>
+        }
+      />
+    </Routes>
   );
 };
 
