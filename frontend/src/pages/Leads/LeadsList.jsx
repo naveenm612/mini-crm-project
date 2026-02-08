@@ -22,10 +22,16 @@ import {
   Chip,
   CircularProgress,
   Tooltip,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
 } from '@mui/material';
+
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
+
 import { leadsAPI } from '../../api/leads.api';
 
 const statusColors = {
@@ -48,6 +54,10 @@ const LeadsList = () => {
     currentPage: 1,
     totalPages: 1,
   });
+
+  // delete dialog state
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [selectedLeadId, setSelectedLeadId] = useState(null);
 
   useEffect(() => {
     fetchLeads();
@@ -74,12 +84,23 @@ const LeadsList = () => {
     }
   };
 
-  const handleDelete = async (id) => {
-    if (!window.confirm('Are you sure you want to delete this lead?')) return;
+  /* ---------------- DELETE HANDLERS ---------------- */
 
+  const openDeleteDialog = (id) => {
+    setSelectedLeadId(id);
+    setDeleteOpen(true);
+  };
+
+  const closeDeleteDialog = () => {
+    setSelectedLeadId(null);
+    setDeleteOpen(false);
+  };
+
+  const confirmDelete = async () => {
     try {
-      await leadsAPI.deleteLead(id);
-      fetchLeads(); // refresh list
+      await leadsAPI.deleteLead(selectedLeadId);
+      closeDeleteDialog();
+      fetchLeads();
     } catch (error) {
       console.error('Delete failed', error);
     }
@@ -160,13 +181,13 @@ const LeadsList = () => {
               <TableBody>
                 {leads.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={5} align="center">
+                    <TableCell colSpan={6} align="center">
                       No leads found
                     </TableCell>
                   </TableRow>
                 ) : (
                   leads.map((lead) => (
-                    <TableRow key={lead._id}>
+                    <TableRow key={lead._id} hover>
                       <TableCell>{lead.name}</TableCell>
                       <TableCell>{lead.email}</TableCell>
                       <TableCell>
@@ -180,22 +201,23 @@ const LeadsList = () => {
                       <TableCell>{lead.company}</TableCell>
                       <TableCell align="right">
                         <Tooltip title="Edit">
-                        <IconButton
-                          color="primary"
-                          onClick={() =>
-                            navigate(`/leads/edit/${lead._id}`)
-                          }
-                        >
-                          <EditIcon />
-                        </IconButton>
+                          <IconButton
+                            color="primary"
+                            onClick={() =>
+                              navigate(`/leads/edit/${lead._id}`)
+                            }
+                          >
+                            <EditIcon />
+                          </IconButton>
                         </Tooltip>
+
                         <Tooltip title="Delete">
-                        <IconButton
-                          color="error"
-                          onClick={() => handleDelete(lead._id)}
-                        >
-                          <DeleteIcon />
-                        </IconButton>
+                          <IconButton
+                            color="error"
+                            onClick={() => openDeleteDialog(lead._id)}
+                          >
+                            <DeleteIcon />
+                          </IconButton>
                         </Tooltip>
                       </TableCell>
                     </TableRow>
@@ -217,6 +239,33 @@ const LeadsList = () => {
           )}
         </>
       )}
+
+      {/* DELETE CONFIRMATION DIALOG */}
+      <Dialog
+        open={deleteOpen}
+        onClose={closeDeleteDialog}
+        maxWidth="xs"
+        fullWidth
+      >
+        <DialogTitle>Delete Lead</DialogTitle>
+        <DialogContent>
+          <Typography>
+            Are you sure you want to delete this lead?
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={closeDeleteDialog} color="inherit">
+            No
+          </Button>
+          <Button
+            onClick={confirmDelete}
+            variant="contained"
+            color="error"
+          >
+            Yes, Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Container>
   );
 };
