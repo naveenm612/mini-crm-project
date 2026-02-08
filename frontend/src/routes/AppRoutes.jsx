@@ -12,7 +12,10 @@ import CompaniesList from '../pages/Companies/CompaniesList';
 import CompanyForm from '../pages/Companies/CompanyForm';
 import CompanyDetail from '../pages/Companies/CompanyDetail';
 import TasksList from '../pages/Tasks/TasksList';
+import EditTask from '../pages/Tasks/EditTask';
 import TaskForm from '../pages/Tasks/TaskForm';
+import EditCompany from '../pages/Companies/EditCompany';
+
 
 const AppRoutes = () => {
   return (
@@ -43,10 +46,12 @@ const AppRoutes = () => {
                   <Route path="/companies" element={<CompaniesList />} />
                   <Route path="/companies/new" element={<CompanyForm />} />
                   <Route path="/companies/:id" element={<CompanyDetail />} />
+                  <Route path="/companies/edit/:id" element={<EditCompany />} />
                   
                   {/* Tasks routes */}
                   <Route path="/tasks" element={<TasksList />} />
                   <Route path="/tasks/new" element={<TaskForm />} />
+                  <Route path="/tasks/edit/:id" element={<EditTask />} />
                   
                   {/* Default redirect */}
                   <Route path="/" element={<Navigate to="/dashboard" replace />} />

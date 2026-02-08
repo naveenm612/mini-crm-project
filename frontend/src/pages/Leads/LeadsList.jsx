@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Box,
@@ -21,6 +21,7 @@ import {
   Pagination,
   Chip,
   CircularProgress,
+  Tooltip,
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -37,60 +38,57 @@ const statusColors = {
 
 const LeadsList = () => {
   const navigate = useNavigate();
+
   const [leads, setLeads] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
-  const [statusFilter, setStatusFilter] = useState('');
+  const [status, setStatus] = useState('');
   const [page, setPage] = useState(1);
   const [pagination, setPagination] = useState({
     currentPage: 1,
     totalPages: 1,
-    totalLeads: 0,
-    limit: 10,
   });
 
   useEffect(() => {
     fetchLeads();
-  }, [page, search, statusFilter]);
+  }, [page, search, status]);
 
   const fetchLeads = async () => {
     setLoading(true);
     try {
-      const response = await leadsAPI.getLeads({
+      const res = await leadsAPI.getLeads({
         page,
         limit: 10,
         search,
-        status: statusFilter,
+        status,
       });
-      if (response.success) {
-        setLeads(response.data);
-        setPagination(response.pagination);
+
+      if (res.success) {
+        setLeads(res.data);
+        setPagination(res.pagination);
       }
     } catch (error) {
-      console.error('Error fetching leads:', error);
+      console.error('Failed to load leads', error);
     } finally {
       setLoading(false);
     }
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm('Are you sure you want to delete this lead?')) {
-      try {
-        await leadsAPI.deleteLead(id);
-        fetchLeads();
-      } catch (error) {
-        console.error('Error deleting lead:', error);
-      }
+    if (!window.confirm('Are you sure you want to delete this lead?')) return;
+
+    try {
+      await leadsAPI.deleteLead(id);
+      fetchLeads(); // refresh list
+    } catch (error) {
+      console.error('Delete failed', error);
     }
   };
 
-  const handlePageChange = (event, value) => {
-    setPage(value);
-  };
-
   return (
-    <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 3 }}>
+    <Container maxWidth="lg" sx={{ mt: 4 }}>
+      {/* HEADER */}
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
         <Typography variant="h4" fontWeight="bold">
           Leads
         </Typography>
@@ -103,22 +101,30 @@ const LeadsList = () => {
         </Button>
       </Box>
 
+      {/* FILTER BAR */}
       <Paper sx={{ p: 2, mb: 2 }}>
         <Box sx={{ display: 'flex', gap: 2 }}>
           <TextField
-            label="Search"
-            variant="outlined"
+            fullWidth
             size="small"
+            label="Search"
+            placeholder="Search by name or email"
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            sx={{ flex: 1 }}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              setPage(1);
+            }}
           />
+
           <FormControl size="small" sx={{ minWidth: 200 }}>
             <InputLabel>Status</InputLabel>
             <Select
-              value={statusFilter}
+              value={status}
               label="Status"
-              onChange={(e) => setStatusFilter(e.target.value)}
+              onChange={(e) => {
+                setStatus(e.target.value);
+                setPage(1);
+              }}
             >
               <MenuItem value="">All</MenuItem>
               <MenuItem value="New">New</MenuItem>
@@ -131,6 +137,7 @@ const LeadsList = () => {
         </Box>
       </Paper>
 
+      {/* TABLE */}
       {loading ? (
         <Box display="flex" justifyContent="center" p={4}>
           <CircularProgress />
@@ -145,9 +152,11 @@ const LeadsList = () => {
                   <TableCell>Email</TableCell>
                   <TableCell>Status</TableCell>
                   <TableCell>Assigned To</TableCell>
+                  <TableCell>Company</TableCell>
                   <TableCell align="right">Actions</TableCell>
                 </TableRow>
               </TableHead>
+
               <TableBody>
                 {leads.length === 0 ? (
                   <TableRow>
@@ -163,26 +172,31 @@ const LeadsList = () => {
                       <TableCell>
                         <Chip
                           label={lead.status}
-                          color={statusColors[lead.status]}
                           size="small"
+                          color={statusColors[lead.status]}
                         />
                       </TableCell>
-                      <TableCell>
-                        {lead.assignedTo?.name || 'Unassigned'}
-                      </TableCell>
+                      <TableCell>{lead.assignedTo}</TableCell>
+                      <TableCell>{lead.company}</TableCell>
                       <TableCell align="right">
+                        <Tooltip title="Edit">
                         <IconButton
                           color="primary"
-                          onClick={() => navigate(`/leads/edit/${lead._id}`)}
+                          onClick={() =>
+                            navigate(`/leads/edit/${lead._id}`)
+                          }
                         >
                           <EditIcon />
                         </IconButton>
+                        </Tooltip>
+                        <Tooltip title="Delete">
                         <IconButton
                           color="error"
                           onClick={() => handleDelete(lead._id)}
                         >
                           <DeleteIcon />
                         </IconButton>
+                        </Tooltip>
                       </TableCell>
                     </TableRow>
                   ))
@@ -191,13 +205,13 @@ const LeadsList = () => {
             </Table>
           </TableContainer>
 
+          {/* PAGINATION */}
           {pagination.totalPages > 1 && (
-            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
+            <Box display="flex" justifyContent="center" mt={3}>
               <Pagination
                 count={pagination.totalPages}
                 page={page}
-                onChange={handlePageChange}
-                color="primary"
+                onChange={(e, value) => setPage(value)}
               />
             </Box>
           )}

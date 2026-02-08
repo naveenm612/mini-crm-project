@@ -1,23 +1,17 @@
-import axios from './axios';
+import api from './axios';
 
 export const authAPI = {
   login: async (credentials) => {
-    const response = await axios.post('/auth/login', credentials);
-    return response.data;
+    const res = await api.post('/auth/login', credentials);
+    return res.data;
   },
 
   register: async (userData) => {
-    const response = await axios.post('/auth/register', userData);
-    return response.data;
+    const res = await api.post('/auth/register', userData);
+    return res.data;
   },
 
-  getMe: async () => {
-    const response = await axios.get('/auth/me');
-    return response.data;
-  },
-
-  getUsers: async () => {
-    const response = await axios.get('/auth/users');
-    return response.data;
-  },
+  // ❌ REMOVED — backend does not have these routes
+  // getMe: async () => api.get('/auth/me'),
+  // getUsers: async () => api.get('/auth/users'),
 };

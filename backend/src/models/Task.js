@@ -12,14 +12,14 @@ const taskSchema = new mongoose.Schema(
       trim: true,
     },
     lead: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Lead',
-      required: [true, 'Please provide lead'],
+      type: String,
+      required: [true, 'Please provide lead name'],
+      trim: true,
     },
     assignedTo: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
-      required: [true, 'Please assign task to a user'],
+      type: String,
+      required: [true, 'Please provide assigned user'],
+      trim: true,
     },
     dueDate: {
       type: Date,

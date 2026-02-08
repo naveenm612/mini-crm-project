@@ -1,17 +1,19 @@
-import jwt from 'jsonwebtoken';
+import jwt from 'jsonwebtoken'
 
 // Generate JWT Token
 export const generateToken = (userId) => {
-  return jwt.sign({ id: userId }, process.env.JWT_SECRET, {
-    expiresIn: process.env.JWT_EXPIRE,
-  });
-};
+  return jwt.sign(
+    { id: userId },
+    process.env.JWT_SECRET,
+    { expiresIn: process.env.JWT_EXPIRES_IN } // ✅ FIXED
+  )
+}
 
 // Verify JWT Token
 export const verifyToken = (token) => {
   try {
-    return jwt.verify(token, process.env.JWT_SECRET);
+    return jwt.verify(token, process.env.JWT_SECRET)
   } catch (error) {
-    return null;
+    return null
   }
-};
+}
