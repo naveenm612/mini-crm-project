@@ -159,7 +159,7 @@ const CompanyDetail = () => {
       </Paper>
 
       {/* LEADS SECTION */}
-      <Paper
+      {/* <Paper
         sx={{
           p: 3,
           boxShadow: '0 8px 24px rgba(0,0,0,0.06)',
@@ -204,7 +204,7 @@ const CompanyDetail = () => {
             </TableBody>
           </Table>
         </TableContainer>
-      </Paper>
+      </Paper> */}
     </Container>
   );
 };
