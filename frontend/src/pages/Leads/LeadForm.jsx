@@ -177,38 +177,24 @@ const LeadForm = () => {
               <MenuItem value="Won">Won</MenuItem>
             </Select>
           </FormControl>
-          <FormControl fullWidth margin="normal">
-            <InputLabel>Assigned To</InputLabel>
-            <Select
-              name="assignedTo"
-              value={formData.assignedTo}
-              onChange={handleChange}
-              label="Assigned To"
-            >
-              <MenuItem value="">Unassigned</MenuItem>
-              {users.map((user) => (
-                <MenuItem key={user._id} value={user._id}>
-                  {user.name}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-          <FormControl fullWidth margin="normal">
-            <InputLabel>Company</InputLabel>
-            <Select
-              name="company"
-              value={formData.company}
-              onChange={handleChange}
-              label="Company"
-            >
-              <MenuItem value="">None</MenuItem>
-              {companies.map((company) => (
-                <MenuItem key={company._id} value={company._id}>
-                  {company.name}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
+          <TextField
+            fullWidth
+            label="Assigned To (User ID)"
+            name="assignedTo"
+            value={formData.assignedTo}
+            onChange={handleChange}
+            margin="normal"
+          />
+
+          <TextField
+            fullWidth
+            label="Company ID"
+            name="company"
+            value={formData.company}
+            onChange={handleChange}
+            margin="normal"
+          />
+
 
           <Box sx={{ mt: 3, display: 'flex', gap: 2 }}>
             <Button

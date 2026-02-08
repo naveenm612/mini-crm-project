@@ -1,33 +1,33 @@
-import axios from './axios';
+import api from './axios';
 
 export const leadsAPI = {
   getLeads: async (params) => {
-    const response = await axios.get('/leads', { params });
-    return response.data;
+    const res = await api.get('/leads', { params });
+    return res.data;
   },
 
   getLead: async (id) => {
-    const response = await axios.get(`/leads/${id}`);
-    return response.data;
+    const res = await api.get(`/leads/${id}`);
+    return res.data;
   },
 
-  createLead: async (leadData) => {
-    const response = await axios.post('/leads', leadData);
-    return response.data;
+  createLead: async (data) => {
+    const res = await api.post('/leads', data);
+    return res.data;
   },
 
-  updateLead: async (id, leadData) => {
-    const response = await axios.put(`/leads/${id}`, leadData);
-    return response.data;
+  updateLead: async (id, data) => {
+    const res = await api.put(`/leads/${id}`, data);
+    return res.data;
   },
 
   deleteLead: async (id) => {
-    const response = await axios.delete(`/leads/${id}`);
-    return response.data;
+    const res = await api.delete(`/leads/${id}`);
+    return res.data;
   },
 
   getDashboardStats: async () => {
-    const response = await axios.get('/leads/stats/dashboard');
-    return response.data;
+    const res = await api.get('/leads/stats/dashboard');
+    return res.data;
   },
 };

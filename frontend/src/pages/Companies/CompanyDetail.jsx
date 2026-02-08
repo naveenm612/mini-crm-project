@@ -15,8 +15,16 @@ import {
   TableRow,
   Chip,
   CircularProgress,
+  Divider,
 } from '@mui/material';
+
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import BusinessIcon from '@mui/icons-material/Business';
+import LocationOnIcon from '@mui/icons-material/LocationOn';
+import LanguageIcon from '@mui/icons-material/Language';
+import PhoneIcon from '@mui/icons-material/Phone';
+import DescriptionIcon from '@mui/icons-material/Description';
+
 import { companiesAPI } from '../../api/companies.api';
 
 const statusColors = {
@@ -26,6 +34,20 @@ const statusColors = {
   Lost: 'error',
   Won: 'success',
 };
+
+const InfoItem = ({ icon, label, value }) => (
+  <Box display="flex" gap={2} alignItems="flex-start">
+    <Box color="primary.main">{icon}</Box>
+    <Box>
+      <Typography variant="body2" color="text.secondary">
+        {label}
+      </Typography>
+      <Typography variant="body1" fontWeight={500}>
+        {value || '-'}
+      </Typography>
+    </Box>
+  </Box>
+);
 
 const CompanyDetail = () => {
   const { id } = useParams();
@@ -54,7 +76,7 @@ const CompanyDetail = () => {
 
   if (loading) {
     return (
-      <Box display="flex" justifyContent="center" p={4}>
+      <Box display="flex" justifyContent="center" p={6}>
         <CircularProgress />
       </Box>
     );
@@ -69,7 +91,8 @@ const CompanyDetail = () => {
   }
 
   return (
-    <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+    <Container maxWidth="lg" sx={{ mt: 4, mb: 6 }}>
+      {/* BACK BUTTON */}
       <Button
         startIcon={<ArrowBackIcon />}
         onClick={() => navigate('/companies')}
@@ -78,70 +101,94 @@ const CompanyDetail = () => {
         Back to Companies
       </Button>
 
-      <Paper sx={{ p: 4, mb: 3 }}>
-        <Typography variant="h4" gutterBottom fontWeight="bold">
+      {/* COMPANY HEADER */}
+      <Paper
+        sx={{
+          p: 4,
+          mb: 4,
+          boxShadow: '0 8px 24px rgba(0,0,0,0.06)',
+        }}
+      >
+        <Typography variant="h4" fontWeight="bold" gutterBottom>
           {company.name}
         </Typography>
-        <Grid container spacing={2} sx={{ mt: 2 }}>
+
+        <Divider sx={{ my: 3 }} />
+
+        <Grid container spacing={3}>
           <Grid item xs={12} md={6}>
-            <Typography variant="body2" color="text.secondary">
-              Industry
-            </Typography>
-            <Typography variant="body1">{company.industry || '-'}</Typography>
+            <InfoItem
+              icon={<BusinessIcon />}
+              label="Industry"
+              value={company.industry}
+            />
           </Grid>
+
           <Grid item xs={12} md={6}>
-            <Typography variant="body2" color="text.secondary">
-              Location
-            </Typography>
-            <Typography variant="body1">{company.location || '-'}</Typography>
+            <InfoItem
+              icon={<LocationOnIcon />}
+              label="Location"
+              value={company.location}
+            />
           </Grid>
+
           <Grid item xs={12} md={6}>
-            <Typography variant="body2" color="text.secondary">
-              Website
-            </Typography>
-            <Typography variant="body1">{company.website || '-'}</Typography>
+            <InfoItem
+              icon={<LanguageIcon />}
+              label="Website"
+              value={company.website}
+            />
           </Grid>
+
           <Grid item xs={12} md={6}>
-            <Typography variant="body2" color="text.secondary">
-              Phone
-            </Typography>
-            <Typography variant="body1">{company.phone || '-'}</Typography>
+            <InfoItem
+              icon={<PhoneIcon />}
+              label="Phone"
+              value={company.phone}
+            />
           </Grid>
+
           <Grid item xs={12}>
-            <Typography variant="body2" color="text.secondary">
-              Description
-            </Typography>
-            <Typography variant="body1">
-              {company.description || '-'}
-            </Typography>
+            <InfoItem
+              icon={<DescriptionIcon />}
+              label="Description"
+              value={company.description}
+            />
           </Grid>
         </Grid>
       </Paper>
 
-      <Paper sx={{ p: 4 }}>
-        <Typography variant="h5" gutterBottom fontWeight="bold">
-          Associated Leads
+      {/* LEADS SECTION */}
+      <Paper
+        sx={{
+          p: 3,
+          boxShadow: '0 8px 24px rgba(0,0,0,0.06)',
+        }}
+      >
+        <Typography variant="h6" fontWeight="bold" mb={2}>
+          Leads from this Company
         </Typography>
+
         <TableContainer>
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell>Name</TableCell>
+                <TableCell>Lead Name</TableCell>
                 <TableCell>Email</TableCell>
                 <TableCell>Status</TableCell>
-                <TableCell>Assigned To</TableCell>
               </TableRow>
             </TableHead>
+
             <TableBody>
               {leads.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={4} align="center">
-                    No leads associated with this company
+                  <TableCell colSpan={3} align="center">
+                    No leads available
                   </TableCell>
                 </TableRow>
               ) : (
                 leads.map((lead) => (
-                  <TableRow key={lead._id}>
+                  <TableRow key={lead._id} hover>
                     <TableCell>{lead.name}</TableCell>
                     <TableCell>{lead.email}</TableCell>
                     <TableCell>
@@ -150,9 +197,6 @@ const CompanyDetail = () => {
                         color={statusColors[lead.status]}
                         size="small"
                       />
-                    </TableCell>
-                    <TableCell>
-                      {lead.assignedTo?.name || 'Unassigned'}
                     </TableCell>
                   </TableRow>
                 ))

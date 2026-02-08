@@ -10,8 +10,8 @@ const leadSchema = new mongoose.Schema(
     email: {
       type: String,
       required: [true, 'Please provide email'],
-      trim: true,
       lowercase: true,
+      trim: true,
     },
     phone: {
       type: String,
@@ -22,14 +22,21 @@ const leadSchema = new mongoose.Schema(
       enum: ['New', 'Contacted', 'Qualified', 'Lost', 'Won'],
       default: 'New',
     },
+
+    // ✅ SAVE NAME DIRECTLY
     assignedTo: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
+      type: String,
+      required: [true, 'Please provide assigned user name'],
+      trim: true,
     },
+
+    // ✅ SAVE COMPANY NAME DIRECTLY
     company: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Company',
+      type: String,
+      required: [true, 'Please provide company name'],
+      trim: true,
     },
+
     isDeleted: {
       type: Boolean,
       default: false,
@@ -39,17 +46,13 @@ const leadSchema = new mongoose.Schema(
       default: null,
     },
   },
-  {
-    timestamps: true,
-  }
+  { timestamps: true }
 );
 
-// Query middleware to exclude soft-deleted leads
+// Hide soft deleted leads
 leadSchema.pre(/^find/, function (next) {
   this.where({ isDeleted: false });
   next();
 });
 
-const Lead = mongoose.model('Lead', leadSchema);
-
-export default Lead;
+export default mongoose.model('Lead', leadSchema);

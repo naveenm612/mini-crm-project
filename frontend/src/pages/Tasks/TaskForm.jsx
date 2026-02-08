@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Container,
@@ -7,84 +7,60 @@ import {
   TextField,
   Button,
   Box,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
   Alert,
+  MenuItem,
+  Select,
+  InputLabel,
+  FormControl,
 } from '@mui/material';
 import { tasksAPI } from '../../api/tasks.api';
-import { leadsAPI } from '../../api/leads.api';
-import { authAPI } from '../../api/auth.api';
+import { useAuth } from '../../context/AuthContext';
 
 const TaskForm = () => {
   const navigate = useNavigate();
+  const { user } = useAuth(); // auto-assign to logged-in user
+
   const [formData, setFormData] = useState({
     title: '',
     description: '',
     lead: '',
-    assignedTo: '',
+    assignedTo: user.name, // ✅ auto-filled
     dueDate: '',
     status: 'Pending',
     priority: 'Medium',
   });
-  const [leads, setLeads] = useState([]);
-  const [users, setUsers] = useState([]);
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  useEffect(() => {
-    fetchDropdownData();
-  }, []);
-
-  const fetchDropdownData = async () => {
-    try {
-      const [leadsRes, usersRes] = await Promise.all([
-        leadsAPI.getLeads({ limit: 100 }),
-        authAPI.getUsers(),
-      ]);
-      if (leadsRes.success) setLeads(leadsRes.data);
-      if (usersRes.success) setUsers(usersRes.data);
-    } catch (error) {
-      console.error('Error fetching dropdown data:', error);
-    }
-  };
-
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+    setFormData({ ...formData, [e.target.name]: e.target.value });
     setError('');
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
 
-    if (!formData.title || !formData.lead || !formData.assignedTo || !formData.dueDate) {
-      setError('Title, Lead, Assigned To, and Due Date are required');
+    if (!formData.title || !formData.lead || !formData.dueDate) {
+      setError('Title, Lead, and Due Date are required');
       return;
     }
 
     setLoading(true);
-
     try {
       await tasksAPI.createTask(formData);
       navigate('/tasks');
     } catch (err) {
-      setError(
-        err.response?.data?.message || 'An error occurred. Please try again.'
-      );
+      setError(err.response?.data?.message || 'Something went wrong');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <Container maxWidth="md" sx={{ mt: 4, mb: 4 }}>
+    <Container maxWidth="md" sx={{ mt: 4 }}>
       <Paper sx={{ p: 4 }}>
-        <Typography variant="h5" gutterBottom fontWeight="bold">
+        <Typography variant="h5" fontWeight="bold" gutterBottom>
           Add Task
         </Typography>
 
@@ -94,7 +70,7 @@ const TaskForm = () => {
           </Alert>
         )}
 
-        <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3 }}>
+        <Box component="form" onSubmit={handleSubmit}>
           <TextField
             fullWidth
             label="Title"
@@ -104,46 +80,38 @@ const TaskForm = () => {
             required
             margin="normal"
           />
+
           <TextField
             fullWidth
             label="Description"
             name="description"
             value={formData.description}
             onChange={handleChange}
-            margin="normal"
             multiline
             rows={3}
+            margin="normal"
           />
-          <FormControl fullWidth margin="normal" required>
-            <InputLabel>Lead</InputLabel>
-            <Select
-              name="lead"
-              value={formData.lead}
-              onChange={handleChange}
-              label="Lead"
-            >
-              {leads.map((lead) => (
-                <MenuItem key={lead._id} value={lead._id}>
-                  {lead.name} - {lead.email}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-          <FormControl fullWidth margin="normal" required>
-            <InputLabel>Assigned To</InputLabel>
-            <Select
-              name="assignedTo"
-              value={formData.assignedTo}
-              onChange={handleChange}
-              label="Assigned To"
-            >
-              {users.map((user) => (
-                <MenuItem key={user._id} value={user._id}>
-                  {user.name}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
+
+          {/* ✅ Lead as TEXT */}
+          <TextField
+            fullWidth
+            label="Lead Name"
+            name="lead"
+            value={formData.lead}
+            onChange={handleChange}
+            required
+            margin="normal"
+          />
+
+          {/* ✅ Assigned To (read-only) */}
+          <TextField
+            fullWidth
+            label="Assigned To"
+            value={formData.assignedTo}
+            margin="normal"
+            disabled
+          />
+
           <TextField
             fullWidth
             label="Due Date"
@@ -153,10 +121,9 @@ const TaskForm = () => {
             onChange={handleChange}
             required
             margin="normal"
-            InputLabelProps={{
-              shrink: true,
-            }}
+            InputLabelProps={{ shrink: true }}
           />
+
           <FormControl fullWidth margin="normal">
             <InputLabel>Status</InputLabel>
             <Select
@@ -170,6 +137,7 @@ const TaskForm = () => {
               <MenuItem value="Completed">Completed</MenuItem>
             </Select>
           </FormControl>
+
           <FormControl fullWidth margin="normal">
             <InputLabel>Priority</InputLabel>
             <Select
@@ -185,18 +153,13 @@ const TaskForm = () => {
           </FormControl>
 
           <Box sx={{ mt: 3, display: 'flex', gap: 2 }}>
-            <Button
-              type="submit"
-              variant="contained"
-              disabled={loading}
-              fullWidth
-            >
+            <Button type="submit" variant="contained" fullWidth disabled={loading}>
               {loading ? 'Saving...' : 'Save'}
             </Button>
             <Button
               variant="outlined"
-              onClick={() => navigate('/tasks')}
               fullWidth
+              onClick={() => navigate('/tasks')}
             >
               Cancel
             </Button>

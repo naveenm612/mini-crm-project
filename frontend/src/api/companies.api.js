@@ -1,28 +1,28 @@
-import axios from './axios';
+import api from './axios';
 
 export const companiesAPI = {
   getCompanies: async () => {
-    const response = await axios.get('/companies');
-    return response.data;
+    const res = await api.get('/companies');
+    return res.data;
   },
 
   getCompany: async (id) => {
-    const response = await axios.get(`/companies/${id}`);
-    return response.data;
+    const res = await api.get(`/companies/${id}`);
+    return res.data;
   },
 
-  createCompany: async (companyData) => {
-    const response = await axios.post('/companies', companyData);
-    return response.data;
+  createCompany: async (data) => {
+    const res = await api.post('/companies', data);
+    return res.data;
   },
 
-  updateCompany: async (id, companyData) => {
-    const response = await axios.put(`/companies/${id}`, companyData);
-    return response.data;
+  updateCompany: async (id, data) => {
+    const res = await api.put(`/companies/${id}`, data);
+    return res.data;
   },
 
   deleteCompany: async (id) => {
-    const response = await axios.delete(`/companies/${id}`);
-    return response.data;
+    const res = await api.delete(`/companies/${id}`);
+    return res.data;
   },
 };

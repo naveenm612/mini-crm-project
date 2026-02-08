@@ -1,33 +1,85 @@
-import axios from './axios';
+// import api from './axios';
 
+// export const tasksAPI = {
+//   getTasks: async (params) => {
+//     const res = await api.get('/tasks', { params });
+//     return res.data;
+//   },
+
+//   getTask: async (id) => {
+//     const res = await api.get(`/tasks/${id}`);
+//     return res.data;
+//   },
+
+//   createTask: async (data) => {
+//     const res = await api.post('/tasks', data);
+//     return res.data;
+//   },
+
+//   updateTask: async (id, data) => {
+//     const res = await api.put(`/tasks/${id}`, data);
+//     return res.data;
+//   },
+
+//   updateTaskStatus: async (id, status) => {
+//     const res = await api.patch(`/tasks/${id}/status`, { status });
+//     return res.data;
+//   },
+
+//   deleteTask: async (id) => {
+//     const res = await api.delete(`/tasks/${id}`);
+//     return res.data;
+//   },
+// };
+
+
+
+import api from './axios';
+
+/**
+ * Tasks API
+ * All methods return `res.data`
+ */
 export const tasksAPI = {
-  getTasks: async (params) => {
-    const response = await axios.get('/tasks', { params });
-    return response.data;
+  /* ---------------- GET ALL TASKS ---------------- */
+  getTasks: async (params = {}) => {
+    const res = await api.get('/tasks', { params });
+    return res.data;
   },
 
-  getTask: async (id) => {
-    const response = await axios.get(`/tasks/${id}`);
-    return response.data;
+  /* ---------------- GET SINGLE TASK ---------------- */
+  getTaskById: async (id) => {
+    if (!id) throw new Error('Task ID is required');
+    const res = await api.get(`/tasks/${id}`);
+    return res.data;
   },
 
-  createTask: async (taskData) => {
-    const response = await axios.post('/tasks', taskData);
-    return response.data;
+  /* ---------------- CREATE ---------------- */
+  createTask: async (data) => {
+    const res = await api.post('/tasks', data);
+    return res.data;
   },
 
-  updateTask: async (id, taskData) => {
-    const response = await axios.put(`/tasks/${id}`, taskData);
-    return response.data;
+  /* ---------------- UPDATE FULL TASK ---------------- */
+  updateTask: async (id, data) => {
+    if (!id) throw new Error('Task ID is required');
+    const res = await api.put(`/tasks/${id}`, data);
+    return res.data;
   },
 
+  /* ---------------- UPDATE STATUS ONLY ---------------- */
   updateTaskStatus: async (id, status) => {
-    const response = await axios.patch(`/tasks/${id}/status`, { status });
-    return response.data;
+    if (!id || !status)
+      throw new Error('Task ID and status are required');
+
+    const res = await api.patch(`/tasks/${id}/status`, { status });
+    return res.data;
   },
 
+  /* ---------------- DELETE ---------------- */
   deleteTask: async (id) => {
-    const response = await axios.delete(`/tasks/${id}`);
-    return response.data;
+    if (!id) throw new Error('Task ID is required');
+    const res = await api.delete(`/tasks/${id}`);
+    return res.data;
   },
 };
