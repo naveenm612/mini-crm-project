@@ -1,0 +1,1 @@
+export const VITE_API_URL = 'https://mini-crm-project-j6zl.onrender.com/api';
